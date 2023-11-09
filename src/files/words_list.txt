@@ -1,0 +1,13 @@
+computer
+desk
+mouse
+phone
+window
+house
+earth
+moon
+space
+task
+manager
+coffee
+roar
