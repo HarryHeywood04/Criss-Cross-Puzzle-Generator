@@ -18,7 +18,7 @@ public class CrissCrossGenerator implements ICrissCrossGenerator {
     public void Generate() {
         Random random = new Random();
         String base = words[random.nextInt(words.length)];
-        Place(base, new int[]{0, 0}, Direction.RIGHT);
+        System.out.println(Place(base, new int[]{45, 32}, Direction.RIGHT));
         System.out.println(base);
     }
 
@@ -43,7 +43,7 @@ public class CrissCrossGenerator implements ICrissCrossGenerator {
         }
         else if (direction == Direction.DOWN && position[1] + processedWord.length < puzzle[0].length){
             for (int i = 0; i < processedWord.length; i++){
-                puzzle[position[0] + i][position[1]] = processedWord[i];
+                puzzle[position[0]][position[1] + i] = processedWord[i];
             }
             return true;
         }
