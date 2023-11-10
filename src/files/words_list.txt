@@ -11,3 +11,8 @@ task
 manager
 coffee
 roar
+microphone
+speaker
+guitar
+lamp
+terrarium
