@@ -7,7 +7,7 @@ public class Main {
     public static void main(String[] args) throws FileNotFoundException {
         ICrissCrossGenerator ccg = new CrissCrossGenerator();
         ccg.Load(wordsFile);
-        char[][] puzzle = ccg.Generate(50);
+        char[][] puzzle = ccg.Generate(30, 12);
         CrissCrossPrinter.print(puzzle);
     }
 }
