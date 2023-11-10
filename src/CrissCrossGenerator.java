@@ -11,7 +11,7 @@ public class CrissCrossGenerator implements ICrissCrossGenerator {
     int currentWordIndex = 0;
     char[][] puzzle; // The puzzle grin
     Random random;
-    ArrayList<String> usedWords; // A list of the used words
+    ArrayList<IWordObject> usedWords; // A list of the used words
     String lastFilePath; // The last filepath used, allows for quick generation of multiple puzzles
 
     public CrissCrossGenerator(){
@@ -75,7 +75,7 @@ public class CrissCrossGenerator implements ICrissCrossGenerator {
                 direction = Direction.DOWN;
             placed = Place(base, pos, direction);
             if (placed){
-                usedWords.add(words[currentWordIndex]);
+                usedWords.add(new WordObject(words[currentWordIndex], pos, direction));
                 words[currentWordIndex] = null;
             }
         }
@@ -114,48 +114,56 @@ public class CrissCrossGenerator implements ICrissCrossGenerator {
     private boolean CheckFits(String word, int[] pos, Direction dir){ //Needs some altering
         int x = pos[0];
         int y = pos[1];
+        if ((dir == Direction.RIGHT && x + word.length() - 1 >= puzzle.length) || (dir == Direction.DOWN && y + word.length() - 1 >= puzzle[0].length))
+            return false;
+        if (x < 1 || y < 1)
+            return false;
 
         if ((dir == Direction.RIGHT && (x == 0 || puzzle[x-1][y] == '\0')) || (dir == Direction.DOWN && (y == 0 || puzzle[x][y-1] == '\0'))){ //if space before word is clear
             boolean marker = false;
             char[] processedWord = word.toCharArray();
             for (int i = 0; i < processedWord.length; i++){
                 if (dir == Direction.RIGHT){
-                    if (puzzle[x+i][y] != '\0' && puzzle[x+i][y] != processedWord[i]){
+                    if ((puzzle[x+i][y] != '\0' && puzzle[x+i][y] != processedWord[i]) || (x != 0 && puzzle[x-1][y] != '\0')){ // If needed slot is used and doesn't match or space before word is used
                         return false;
                     }
-                    else if (y != 0 && puzzle[x+i][y+1] != '\0'){
-                        if (marker)
+                    else if (y != 0 && puzzle[x+i][y+1] != '\0' && puzzle[x+i][y] != processedWord[i]){ // If space below is used
+                        if (marker || i == processedWord.length-1 || puzzle[x+i][y] != processedWord[i])
                             return false;
                         else
                             marker = true;
                     }
-                    else if (y != puzzle[0].length-1 && puzzle[x+i][y-1] != '\0'){
-                        if (marker)
+                    else if (y != puzzle[0].length-1 && puzzle[x+i][y-1] != '\0' && puzzle[x+i][y] != processedWord[i]){ // If space above is used
+                        if (marker || i == processedWord.length-1 || puzzle[x+i][y] != processedWord[i])
                             return false;
                         else
                             marker = true;
                     } else
                         marker = false;
+                    if (x+i+1 < puzzle.length && i == processedWord.length-1 && puzzle[x+i+1][y] != '\0')
+                        return false;
                 } else {
-                    if (!(puzzle[x][y+i] == '\0' || puzzle[x][y+i] == processedWord[i])){
+                    if ((puzzle[x][y+i] != '\0' && puzzle[x][y+i] != processedWord[i]) || (y != 0 && puzzle[x][y-1] != '\0')){
                         return false;
                     }
                     else if (x != 0 && puzzle[x+1][y+i] != '\0'){
-                        if (marker)
+                        if ((marker || i == processedWord.length-1 || puzzle[x][y+i] != processedWord[i]))
                             return false;
                         else
                             marker = true;
                     }
                     else if (x != puzzle.length-1 && puzzle[x-1][y+i] != '\0'){
-                        if (marker)
+                        if ((marker || i == processedWord.length-1 || puzzle[x][y+i] != processedWord[i]))
                             return false;
                         else
                             marker = true;
                     } else
                         marker = false;
+                    if (y+i+1 < puzzle[0].length && i == processedWord.length-1 && puzzle[x][y+i+1] != '\0')
+                        return false;
                 }
             }
-            return true;
+            return !marker;
         } else {
             return false;
         }
@@ -182,13 +190,13 @@ public class CrissCrossGenerator implements ICrissCrossGenerator {
                     }
                     if (dir == Direction.RIGHT && CheckFits(word, new int[]{point[0] - wordIndex, point[1]}, dir)){
                         if (Place(word, new int[]{point[0] - wordIndex, point[1]}, dir)) {
-                            usedWords.add(word);
+                            usedWords.add(new WordObject(word, point, dir));
                             words[currentWordIndex] = null;
                             return true;
                         }
                     } else if (dir == Direction.DOWN && CheckFits(word, new int[]{point[0], point[1] - wordIndex}, dir)){
                         if(Place(word, new int[]{point[0], point[1] - wordIndex}, dir)) {
-                            usedWords.add(word);
+                            usedWords.add(new WordObject(word, point, dir));
                             words[currentWordIndex] = null;
                             return true;
                         }
