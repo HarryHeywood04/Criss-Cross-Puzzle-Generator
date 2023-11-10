@@ -9,19 +9,22 @@ public class CrissCrossGenerator implements ICrissCrossGenerator {
     File wordsFile;
     String words[];
     char puzzle[][];
+    Random random;
 
     public CrissCrossGenerator(){
         puzzle = new char[50][50];
+        random = new Random();
     }
 
     @Override
-    public void Generate() {
-        Random random = new Random();
-        String base = words[random.nextInt(words.length)];
-        System.out.println(Place(base, new int[]{45, 32}, Direction.RIGHT));
-        System.out.println(base);
+    public char[][] Generate() {
+        Begin();
+        return puzzle;
     }
 
+    /*
+    Loads the words list from the input file
+     */
     @Override
     public void Load(String filePath) throws FileNotFoundException {
         wordsFile = new File(filePath);
@@ -33,6 +36,29 @@ public class CrissCrossGenerator implements ICrissCrossGenerator {
         words = list.toArray(new String[0]);
     }
 
+    /*
+    Attempts to randomly place first word on the grid until it succeeds.
+     */
+    private void Begin(){
+        boolean placed = false;
+        while (!placed){
+            int wordIndex = random.nextInt(words.length);
+            String base = words[wordIndex];
+            int[] pos = new int[]{random.nextInt(40), random.nextInt(40)};
+            Direction direction;
+            if (random.nextBoolean())
+                direction = Direction.RIGHT;
+            else
+                direction = Direction.DOWN;
+            placed = Place(base, pos, direction);
+            if (placed)
+                words[wordIndex] = null;
+        }
+    }
+
+    /*
+    Takes in the word, position and rotation and attempts to place it on the grid.
+     */
     private boolean Place(String word, int position[], Direction direction){
         char processedWord[] = word.toCharArray();
         if (direction == Direction.RIGHT && position[0] + processedWord.length < puzzle.length){
