@@ -7,9 +7,9 @@ import java.util.Scanner;
 public class CrissCrossGenerator implements ICrissCrossGenerator {
 
     File wordsFile; // The file with the words
-    String words[]; // An array of the words
+    String[] words; // An array of the words
     int currentWordIndex = 0;
-    char puzzle[][]; // The puzzle grin
+    char[][] puzzle; // The puzzle grin
     Random random;
     ArrayList<String> usedWords; // A list of the used words
     String lastFilePath; // The last filepath used, allows for quick generation of multiple puzzles
@@ -19,10 +19,10 @@ public class CrissCrossGenerator implements ICrissCrossGenerator {
 
     /**
      * Generates a puzzle with the width and height of the input size and attempts to reach the input word amount
-     * @param size
-     * @param wordAmount
-     * @return
-     * @throws FileNotFoundException
+     * @param size Width and height of the puzzle
+     * @param wordAmount Amount of words to put in puzzle
+     * @return Returns the puzzle
+     * @throws FileNotFoundException Can throw an error if the no file has been loaded
      */
     @Override
     public char[][] Generate(int size, int wordAmount) throws FileNotFoundException {
@@ -34,16 +34,16 @@ public class CrissCrossGenerator implements ICrissCrossGenerator {
         Begin();
         wordAmount--;
         while (wordAmount > 0){
-            GenerateWord();
-            wordAmount--;
+            if (GenerateWord())
+                wordAmount--;
         }
         return puzzle;
     }
 
     /**
      * Loads words from the input file path
-     * @param filePath
-     * @throws FileNotFoundException
+     * @param filePath Path of the file
+     * @throws FileNotFoundException Throws error if input file is not found
      */
     @Override
     public void Load(String filePath) throws FileNotFoundException {
@@ -53,7 +53,7 @@ public class CrissCrossGenerator implements ICrissCrossGenerator {
         Scanner scanner = new Scanner(wordsFile);
         while (scanner.hasNextLine()){
             String word = scanner.nextLine();
-            word.replace(' ', '\0'); // deletes any white space characters
+            word = word.replace(' ', '\0'); // deletes any white space characters
             list.add(word);
         }
         words = list.toArray(new String[0]);
@@ -106,10 +106,10 @@ public class CrissCrossGenerator implements ICrissCrossGenerator {
 
     /**
      * Checks that the word placement fits the rules
-     * @param word
-     * @param pos
-     * @param dir
-     * @return
+     * @param word The word to be placed
+     * @param pos The position to place it
+     * @param dir The rotation of the word
+     * @return Returns if it fits or not
      */
     private boolean CheckFits(String word, int[] pos, Direction dir){ //Needs some altering
         int x = pos[0];
@@ -136,7 +136,7 @@ public class CrissCrossGenerator implements ICrissCrossGenerator {
                             marker = true;
                     } else
                         marker = false;
-                } else if (dir == Direction.DOWN){
+                } else {
                     if (!(puzzle[x][y+i] == '\0' || puzzle[x][y+i] == processedWord[i])){
                         return false;
                     }
@@ -155,13 +155,15 @@ public class CrissCrossGenerator implements ICrissCrossGenerator {
                         marker = false;
                 }
             }
+            return true;
+        } else {
+            return false;
         }
-        return true;
     }
 
     /**
      * Generates a new word on the puzzle grid
-     * @return
+     * @return Returns whether it succeeded
      */
     private boolean GenerateWord(){
         int MAX = 100000;
@@ -182,13 +184,13 @@ public class CrissCrossGenerator implements ICrissCrossGenerator {
                         if (Place(word, new int[]{point[0] - wordIndex, point[1]}, dir)) {
                             usedWords.add(word);
                             words[currentWordIndex] = null;
-                            break;
+                            return true;
                         }
                     } else if (dir == Direction.DOWN && CheckFits(word, new int[]{point[0], point[1] - wordIndex}, dir)){
                         if(Place(word, new int[]{point[0], point[1] - wordIndex}, dir)) {
                             usedWords.add(word);
                             words[currentWordIndex] = null;
-                            break;
+                            return true;
                         }
                     }
                 }
@@ -199,8 +201,8 @@ public class CrissCrossGenerator implements ICrissCrossGenerator {
 
     /**
      * Finds a word that contains the input char
-     * @param c
-     * @return
+     * @param c The char to find a word match for
+     * @return A string containing the word match
      */
     private String FindWord(char c){
         while (true){
@@ -208,8 +210,8 @@ public class CrissCrossGenerator implements ICrissCrossGenerator {
             String word = words[t];
             if (word != null){
                 char[] processedWord = word.toCharArray();
-                for (int i = 0; i < processedWord.length; i++){
-                    if (processedWord[i] == c){
+                for (char value : processedWord) {
+                    if (value == c) {
                         currentWordIndex = t;
                         return word;
                     }
@@ -220,15 +222,15 @@ public class CrissCrossGenerator implements ICrissCrossGenerator {
 
     /**
      * Takes in the word, position and rotation and attempts to place it on the grid.
-     * @param word
-     * @param position
-     * @param direction
-     * @return
+     * @param word The word to place
+     * @param position The position to place the word
+     * @param direction The rotation of the word
+     * @return Whether it was successful or not
      */
-    private boolean Place(String word, int position[], Direction direction){
+    private boolean Place(String word, int[] position, Direction direction){
         int x = position[0];
         int y  = position[1];
-        char processedWord[] = word.toCharArray();
+        char[] processedWord = word.toCharArray();
         if (direction == Direction.RIGHT && position[0] + processedWord.length < puzzle.length){
             for (int i = 0; i < processedWord.length; i++){
                 puzzle[x + i][y] = processedWord[i];
@@ -246,8 +248,8 @@ public class CrissCrossGenerator implements ICrissCrossGenerator {
 
     /**
      * Returns the available direction from pos, returns null if none found.
-     * @param pos
-     * @return
+     * @param pos The position to get the free direction from
+     * @return The available direction
      */
     private Direction GetAvailableDirection(int[] pos){
         int x = pos[0];
@@ -267,14 +269,16 @@ public class CrissCrossGenerator implements ICrissCrossGenerator {
 
     /**
      * Checks if the passed in array has any null values (has been 'used')
-     * @param words
-     * @return
+     * @param words The words array to check
+     * @return Whether it has been used or not
      */
     private boolean IsUsed(String[] words){
         boolean result = false;
-        for (int i = 0; i < words.length; i++)
-            if (words[i] == null)
+        for (String word : words)
+            if (word == null) {
                 result = true;
+                break;
+            }
         return result;
     }
 }
