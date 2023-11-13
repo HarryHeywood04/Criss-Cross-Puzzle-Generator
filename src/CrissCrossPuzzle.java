@@ -1,8 +1,8 @@
 import java.util.ArrayList;
 
 public class CrissCrossPuzzle {
-    char[][] grid;
-    IWordObject[] words;
+    private char[][] grid;
+    private IWordObject[] words;
 
     public CrissCrossPuzzle(char[][] puzzleIn, ArrayList<IWordObject> wordsIn) {
         grid = puzzleIn;

@@ -74,7 +74,7 @@ public class CrissCrossGenerator implements ICrissCrossGenerator {
         while (!placed){
             currentWordIndex = random.nextInt(words.length);
             String base = words[currentWordIndex];
-            int[] pos = new int[]{random.nextInt(5, puzzle.length-5), random.nextInt(5, puzzle[0].length-5)};
+            int[] pos = new int[]{random.nextInt((puzzle.length/2) - 2, (puzzle.length/2) + 2), random.nextInt((puzzle.length/2) - 2, (puzzle.length/2) + 2) };
             Direction direction;
             if (random.nextBoolean())
                 direction = Direction.RIGHT;
@@ -82,6 +82,7 @@ public class CrissCrossGenerator implements ICrissCrossGenerator {
                 direction = Direction.DOWN;
             placed = Place(base, pos, direction);
             if (placed){
+                System.out.println(words[currentWordIndex]);
                 usedWords.add(new WordObject(words[currentWordIndex], pos, direction));
                 words[currentWordIndex] = null;
             }
@@ -124,10 +125,12 @@ public class CrissCrossGenerator implements ICrissCrossGenerator {
     private boolean CheckFits(String word, int[] pos, Direction dir){ //Needs some altering
         int x = pos[0];
         int y = pos[1];
+
         if ((dir == Direction.RIGHT && x + word.length() - 1 >= puzzle.length) || (dir == Direction.DOWN && y + word.length() - 1 >= puzzle[0].length))
             return false;
         if (x < 1 || y < 1)
             return false;
+
 
         if ((dir == Direction.RIGHT && (x == 0 || puzzle[x-1][y] == '\0')) || (dir == Direction.DOWN && (y == 0 || puzzle[x][y-1] == '\0'))){ //if space before word is clear
             boolean marker = false;
@@ -186,8 +189,9 @@ public class CrissCrossGenerator implements ICrissCrossGenerator {
     private boolean GenerateWord(){
         Direction dir;
         for (int i = 0; i < MAX; i++){
-            int[] point = new int[]{random.nextInt(10, puzzle.length-10), random.nextInt(1, puzzle[0].length-1)};
-            if (puzzle[point[0]][point[1]] != '\0'){ // If char exists in this position
+            Boolean flag = true;
+            int[] point = new int[]{random.nextInt(2, puzzle.length-2), random.nextInt(1, puzzle[0].length-1)};
+            if (puzzle[point[0]][point[1]] != '\0' && flag){ // If char exists in this position and is not start of other word
                 dir = GetAvailableDirection(point); // get available direction
                 if (dir != null){
                     String word = FindWord(puzzle[point[0]][point[1]]);
@@ -201,13 +205,13 @@ public class CrissCrossGenerator implements ICrissCrossGenerator {
                     }
                     if (dir == Direction.RIGHT && CheckFits(word, new int[]{point[0] - wordIndex, point[1]}, dir)){
                         if (Place(word, new int[]{point[0] - wordIndex, point[1]}, dir)) {
-                            usedWords.add(new WordObject(word, point, dir));
+                            usedWords.add(new WordObject(word, new int[]{point[0] - wordIndex, point[1]}, dir));
                             words[currentWordIndex] = null;
                             return true;
                         }
                     } else if (dir == Direction.DOWN && CheckFits(word, new int[]{point[0], point[1] - wordIndex}, dir)){
                         if(Place(word, new int[]{point[0], point[1] - wordIndex}, dir)) {
-                            usedWords.add(new WordObject(word, point, dir));
+                            usedWords.add(new WordObject(word, new int[]{point[0], point[1] - wordIndex}, dir));
                             words[currentWordIndex] = null;
                             return true;
                         }
@@ -251,6 +255,10 @@ public class CrissCrossGenerator implements ICrissCrossGenerator {
         int x = position[0];
         int y  = position[1];
         char[] processedWord = word.toCharArray();
+        for (IWordObject w : usedWords) {
+            if (w.GetPos()[0] == x && w.GetPos()[1] == y)
+                return false;
+        }
         if (direction == Direction.RIGHT && position[0] + processedWord.length < puzzle.length){
             for (int i = 0; i < processedWord.length; i++){
                 puzzle[x + i][y] = processedWord[i];
