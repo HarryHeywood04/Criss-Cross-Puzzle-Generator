@@ -9,7 +9,7 @@ public class Main {
         wordsFile = filePath + args[0];
         ICrissCrossGenerator ccg = new CrissCrossGenerator();
         ccg.Load(wordsFile);
-        char[][] puzzle = ccg.Generate(50, 20);
-        CrissCrossPrinter.print(puzzle);
+        CrissCrossPuzzle puzzle = ccg.Generate(100, 1000);
+        CrissCrossPrinter.print(puzzle.getGrid());
     }
 }
