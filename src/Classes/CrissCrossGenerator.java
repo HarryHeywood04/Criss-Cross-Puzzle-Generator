@@ -1,3 +1,9 @@
+package Classes;
+
+import Enums.Direction;
+import Interfaces.ICrissCrossGenerator;
+import Interfaces.IWordObject;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -42,8 +48,7 @@ public class CrissCrossGenerator implements ICrissCrossGenerator {
                 break;
             i++;
         }
-        CrissCrossPuzzle crissCrossPuzzle = new CrissCrossPuzzle(puzzle, usedWords);
-        return crissCrossPuzzle;
+        return new CrissCrossPuzzle(puzzle, usedWords);
     }
 
     /**
@@ -132,15 +137,15 @@ public class CrissCrossGenerator implements ICrissCrossGenerator {
             return false;
 
 
-        if ((dir == Direction.RIGHT && (x == 0 || puzzle[x-1][y] == '\0')) || (dir == Direction.DOWN && (y == 0 || puzzle[x][y-1] == '\0'))){ //if space before word is clear
+        if ((dir == Direction.RIGHT && (puzzle[x-1][y] == '\0')) || (dir == Direction.DOWN && (puzzle[x][y-1] == '\0'))){ //if space before word is clear
             boolean marker = false;
             char[] processedWord = word.toCharArray();
             for (int i = 0; i < processedWord.length; i++){
                 if (dir == Direction.RIGHT){
-                    if ((puzzle[x+i][y] != '\0' && puzzle[x+i][y] != processedWord[i]) || (x != 0 && puzzle[x-1][y] != '\0')){ // If needed slot is used and doesn't match or space before word is used
+                    if ((puzzle[x+i][y] != '\0' && puzzle[x+i][y] != processedWord[i]) || (puzzle[x-1][y] != '\0')){ // If needed slot is used and doesn't match or space before word is used
                         return false;
                     }
-                    else if (y != 0 && puzzle[x+i][y+1] != '\0' && puzzle[x+i][y] != processedWord[i]){ // If space below is used
+                    else if (puzzle[x+i][y+1] != '\0' && puzzle[x+i][y] != processedWord[i]){ // If space below is used
                         if (marker || i == processedWord.length-1 || puzzle[x+i][y] != processedWord[i])
                             return false;
                         else
@@ -156,10 +161,10 @@ public class CrissCrossGenerator implements ICrissCrossGenerator {
                     if (x+i+1 < puzzle.length && i == processedWord.length-1 && puzzle[x+i+1][y] != '\0')
                         return false;
                 } else {
-                    if ((puzzle[x][y+i] != '\0' && puzzle[x][y+i] != processedWord[i]) || (y != 0 && puzzle[x][y-1] != '\0')){
+                    if ((puzzle[x][y+i] != '\0' && puzzle[x][y+i] != processedWord[i]) || puzzle[x][y-1] != '\0'){
                         return false;
                     }
-                    else if (x != 0 && puzzle[x+1][y+i] != '\0'){
+                    else if (puzzle[x+1][y+i] != '\0'){
                         if ((marker || i == processedWord.length-1 || puzzle[x][y+i] != processedWord[i]))
                             return false;
                         else
@@ -189,9 +194,8 @@ public class CrissCrossGenerator implements ICrissCrossGenerator {
     private boolean GenerateWord(){
         Direction dir;
         for (int i = 0; i < MAX; i++){
-            Boolean flag = true;
             int[] point = new int[]{random.nextInt(2, puzzle.length-2), random.nextInt(1, puzzle[0].length-1)};
-            if (puzzle[point[0]][point[1]] != '\0' && flag){ // If char exists in this position and is not start of other word
+            if (puzzle[point[0]][point[1]] != '\0'){ // If char exists in this position and is not start of other word
                 dir = GetAvailableDirection(point); // get available direction
                 if (dir != null){
                     String word = FindWord(puzzle[point[0]][point[1]]);
@@ -266,9 +270,7 @@ public class CrissCrossGenerator implements ICrissCrossGenerator {
             return true;
         }
         else if (direction == Direction.DOWN && position[1] + processedWord.length < puzzle[0].length){
-            for (int i = 0; i < processedWord.length; i++){
-                puzzle[x][y + i] = processedWord[i];
-            }
+            System.arraycopy(processedWord, 0, puzzle[x], y, processedWord.length);
             return true;
         }
         return false;

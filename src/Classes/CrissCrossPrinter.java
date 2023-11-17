@@ -1,8 +1,9 @@
-import java.io.File;
+package Classes;
+
+import Interfaces.IWordObject;
+
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Comparator;
 
 public class CrissCrossPrinter {
     static int px = 35;
@@ -45,18 +46,18 @@ public class CrissCrossPrinter {
         int h = 30;
         int y = h*px;
         int x = 20;
-        for (int i = 0; i < words.length; i++){
-            if (words[i].GetLength() != curLength){
-                if (y > (h*px) + 220){
-                    y = h*px;
+        for (IWordObject word : words) {
+            if (word.GetLength() != curLength) {
+                if (y > (h * px) + 220) {
+                    y = h * px;
                     x += 250;
                 }
-                curLength = words[i].GetLength();
+                curLength = word.GetLength();
                 y += (px / 1.2);
-                file.write ("<text x=\"" + x + "\" y=\"" + y + "\" font-size=\"2em\" fill=\"black\">" + curLength + " letter words:</text>");
+                file.write("<text x=\"" + x + "\" y=\"" + y + "\" font-size=\"2em\" fill=\"black\">" + curLength + " letter words:</text>");
                 y += (px / 1.2);
             }
-            file.write ("<text x=\"" + x + "\" y=\"" + y + "\" font-size=\"1.8em\" fill=\"black\">" + words[i].GetWord() + "</text>");
+            file.write("<text x=\"" + x + "\" y=\"" + y + "\" font-size=\"1.8em\" fill=\"black\">" + word.GetWord() + "</text>");
             y += (px / 1.2);
         }
 
@@ -67,19 +68,16 @@ public class CrissCrossPrinter {
     private static String GenerateBox(int x, int y){
         x*=px;
         y*=px;
-        String line = "<polyline points=\"" + x + ".00," + y + ".00 " + (x+px) + ".00," + y + ".00 " + (x+px) + ".00," + (y+px) + ".00 " + x + ".00," + (y+px) + ".00 " + x + ".00," + y + ".00 " + "\" style=\"fill:white;stroke:black;stroke-width:1.0\"/>\n";
-        return line;
+        return "<polyline points=\"" + x + ".00," + y + ".00 " + (x+px) + ".00," + y + ".00 " + (x+px) + ".00," + (y+px) + ".00 " + x + ".00," + (y+px) + ".00 " + x + ".00," + y + ".00 " + "\" style=\"fill:white;stroke:black;stroke-width:1.0\"/>\n";
     }
 
     private static String GenerateCountText(int count, int x, int y){
         x*=px;
         y*=px;
-        String line = "<text x=\"" + (x+3) + "\" y=\"" + (y+13) + "\" fill=\"black\">" + count + "</text>";
-        return line;
+        return "<text x=\"" + (x+3) + "\" y=\"" + (y+13) + "\" fill=\"black\">" + count + "</text>";
     }
 
     private static void ConsolePrint(char[][] puzzle){
-        char c;
         for (int i = 0; i < puzzle.length; i++){
             for (int j = 0; j < puzzle[i].length; j++){
                 if (puzzle[j][i] != '\0')

@@ -1,3 +1,8 @@
+package Classes;
+
+import Enums.Direction;
+import Interfaces.IWordObject;
+
 public class WordObject implements IWordObject {
     String word;
     int[] pos;

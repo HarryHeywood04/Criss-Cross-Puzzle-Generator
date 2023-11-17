@@ -1,8 +1,12 @@
+package Classes;
+
+import Interfaces.IWordObject;
+
 import java.util.ArrayList;
 
 public class CrissCrossPuzzle {
-    private char[][] grid;
-    private IWordObject[] words;
+    private final char[][] grid;
+    private final IWordObject[] words;
 
     public CrissCrossPuzzle(char[][] puzzleIn, ArrayList<IWordObject> wordsIn) {
         grid = puzzleIn;

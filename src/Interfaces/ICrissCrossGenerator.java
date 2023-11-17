@@ -1,3 +1,7 @@
+package Interfaces;
+
+import Classes.CrissCrossPuzzle;
+
 import java.io.FileNotFoundException;
 
 public interface ICrissCrossGenerator {
