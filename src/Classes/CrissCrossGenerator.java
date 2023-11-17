@@ -91,7 +91,7 @@ public class CrissCrossGenerator implements ICrissCrossGenerator {
                 usedWords.add(new WordObject(words[currentWordIndex], pos, direction));
                 words[currentWordIndex] = null;
             }
-            if (i > MAX)
+            if (i > 20)
                 break;
             i++;
         }
@@ -232,7 +232,7 @@ public class CrissCrossGenerator implements ICrissCrossGenerator {
      * @return A string containing the word match
      */
     private String FindWord(char c){
-        for (int i = 0; i < MAX; i++){
+        for (int i = 0; i < 30; i++){
             int t = random.nextInt(words.length);
             String word = words[t];
             if (word != null){
